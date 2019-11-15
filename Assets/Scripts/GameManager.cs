@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,10 +10,19 @@ public class GameManager : MonoBehaviour
     Rigidbody playerRb;
 
     public float enemiesSpawned = 0;
+    public float score = 0;
+    public float playerHealth = 10;
+    //public float maxHealth = 10;
 
     public float XLimit;
     public float upperZLimit;
     public float lowerZLimit;
+
+    //Reference to current score text
+    public Text currScoreText;
+    public Text healthText;
+
+    public Image healthBar;
 
     // Start is called before the first frame update
     void Start()
@@ -23,6 +34,19 @@ public class GameManager : MonoBehaviour
     void Update()
     {
 
+        if (playerHealth < 1)
+        {
+            Debug.Log("Player ded");
+        }
+
+        //Pressing R resets the scene
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+
+        UiPrint();
+        
         //Sets the scenes boundaries
         //Boundaries on the x-axis
         if (player.transform.position.x < -XLimit)
@@ -43,5 +67,14 @@ public class GameManager : MonoBehaviour
         {
             playerRb.AddForce(new Vector3(0, 0, 3), ForceMode.Impulse);
         }
+    }
+
+    void UiPrint()
+    {
+        //UI Updates
+        currScoreText.text = "Score: " + score.ToString();
+        healthBar.fillAmount = playerHealth / 10;
+        healthText.text = "Health " + playerHealth.ToString();
+
     }
 }

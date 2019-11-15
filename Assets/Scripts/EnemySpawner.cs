@@ -9,8 +9,11 @@ public class EnemySpawner : MonoBehaviour
     GameManager gameManager;
 
     public float spawnRate;
-    public float spawnerXRange;
-    public float spawnerZPosition;
+    public float topSpawnerXRange;
+    public float topSpawnerZPosition;
+
+    public float rightSpawnerZRange;
+    public float rightSpawnerXPosition;
 
     // Start is called before the first frame update
     void Start()
@@ -18,7 +21,7 @@ public class EnemySpawner : MonoBehaviour
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
         
         //Enemy = GameObject.FindGameObjectWithTag("Enemy");
-        InvokeRepeating("SpawnOne", 1.0f, spawnRate);
+        InvokeRepeating("SpawnOne", 1.0f, 1);
     }
 
     // Update is called once per frame
@@ -29,11 +32,24 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnOne()
     {
+        StartCoroutine(WaitFor());
         if (gameManager.enemiesSpawned < 10)
         {
-            spawnRate = Random.Range(3, 10);
-            Instantiate(Enemy, new Vector3(Random.Range(-spawnerXRange, spawnerXRange), 1, spawnerZPosition), Enemy.transform.rotation);
+            //Top spawn
+            Instantiate(Enemy, new Vector3(Random.Range(-topSpawnerXRange, topSpawnerXRange), 1, topSpawnerZPosition), Enemy.transform.rotation);
             gameManager.enemiesSpawned++;
-        } 
+        }
+        if (gameManager.enemiesSpawned < 10)
+        {
+            //Side spawn
+            Instantiate(Enemy, new Vector3(rightSpawnerXPosition, 1, Random.Range(-rightSpawnerZRange, rightSpawnerZRange)), Enemy.transform.rotation);
+            gameManager.enemiesSpawned++;
+        }
+        spawnRate = Random.Range(3, 10);
+    }
+
+    IEnumerator WaitFor()
+    {
+        yield return new WaitForSeconds(spawnRate);
     }
 }

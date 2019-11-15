@@ -6,23 +6,28 @@ public class PlayerControl : MonoBehaviour
 {
     Rigidbody rb;
 
+    GameManager gameManager;
+
+    //Movement axis
     float Horizontal;
     float Vertical;
 
     public GameObject projectile;
-
+    //Stores the force the player is being pushed with
     public float forwardForce = 10;
-
+    //Stores the players rotate speed in degrees 
     public float rotateSpeed = 5;
 
     //Projectile stuff---------------
-    float spawnDistance = 5;
+    float spawnDistance = 3;
     Vector3 spawnPos;
     //-------------------------------
 
     // Start is called before the first frame update
     void Start()
     {
+        gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+
         rb = GetComponent<Rigidbody>();
     }
 
@@ -33,8 +38,8 @@ public class PlayerControl : MonoBehaviour
         this.Vertical = Input.GetAxis("Vertical");
         //Left and right turn axis
         this.Horizontal = Input.GetAxis("Horizontal");
-
-        if (Input.GetKeyDown(KeyCode.Space))
+        //Input.GetButtonDown("");
+        if (Input.GetButtonDown("Fire1"))
         {
             //Set the spawn position for the projectile
             spawnPos = this.transform.position + this.transform.forward * spawnDistance;
@@ -47,5 +52,15 @@ public class PlayerControl : MonoBehaviour
 
         //Rotate player
         this.transform.Rotate(new Vector3(0, rotateSpeed * this.Horizontal * Time.deltaTime * 10));
+
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            gameManager.playerHealth--;
+            
+        }
     }
 }
