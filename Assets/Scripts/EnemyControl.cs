@@ -8,9 +8,12 @@ public class EnemyControl : MonoBehaviour
     GameManager gameManager;
 
     Rigidbody rb;
-
+    //The object the enemy follows
     GameObject followedObject;
-   
+    //Enemys projectile
+    public GameObject projectile;
+
+    //Healthbar
     Canvas health;
     RectTransform rectTransform;
     public Image healthBar;
@@ -18,6 +21,13 @@ public class EnemyControl : MonoBehaviour
     public float enemySpeed = 5;
 
     public float enemyHealth = 3;
+
+    //Projectile stuff---------------
+    float spawnDistance = 3;
+    Vector3 spawnPos;
+    bool isSpawning;
+    public float shootInterval = 2;
+    //-------------------------------
 
     // Start is called before the first frame update
     void Start()
@@ -48,10 +58,26 @@ public class EnemyControl : MonoBehaviour
         //Healthbar update
         healthBar.fillAmount = enemyHealth / 3;
 
+        //Prjectile spawning
+        if (!isSpawning)
+        {
+            Invoke("SpawnProjectile", shootInterval);
+            isSpawning = true;
+        }
+
         if (enemyHealth < 1)
         {
             gameManager.score+=2;
             Destroy(gameObject);
         }
+    }
+
+    void SpawnProjectile()
+    {
+        //Sets the projectiles spawn position
+        spawnPos = this.transform.position + this.transform.forward * spawnDistance;
+        //Spawn the projectile
+        Instantiate(projectile, spawnPos, this.transform.rotation);
+        isSpawning = false;
     }
 }

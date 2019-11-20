@@ -248,9 +248,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e02b8ca61bce0746bf674674774b69c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  projectile: {fileID: 731351024975848550, guid: 9748ad8f90b1ef04c92b5df752d4998e,
+    type: 3}
   healthBar: {fileID: 6577358389722589831}
   enemySpeed: 10
   enemyHealth: 3
+  shootInterval: 2
 --- !u!1 &8753822885631848543
 GameObject:
   m_ObjectHideFlags: 0

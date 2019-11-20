@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
 
         if (playerHealth < 1)
         {
-            Debug.Log("Player ded");
+            //Debug.Log("Player ded");
         }
 
         //Pressing R resets the scene
@@ -76,5 +76,13 @@ public class GameManager : MonoBehaviour
         healthBar.fillAmount = playerHealth / 10;
         healthText.text = "Health " + playerHealth.ToString();
 
+    }
+
+    public void TenSpawned()
+    {
+        if (playerHealth < 10)
+        {
+            playerHealth++;
+        }
     }
 }
