@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerControl : MonoBehaviour
 {
@@ -14,6 +15,15 @@ public class PlayerControl : MonoBehaviour
     float Vertical1;
     float Strafe;
 
+    //Input actions
+    PlayerInputActions inputAction;
+
+    //Move
+    Vector2 movementInput;
+    //FireDirection
+    Vector2 lookDirection;
+
+    public Camera mainCamera;
     public GameObject projectile;
     //Stores the force the player is being pushed with
     public float forwardForce = 10;
@@ -29,28 +39,45 @@ public class PlayerControl : MonoBehaviour
     float test;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
 
         rb = GetComponent<Rigidbody>();
 
         isSpawning = false;
+
+        inputAction = new PlayerInputActions();
+        inputAction.Player.Move.performed += ctx => movementInput = ctx.ReadValue<Vector2>();
+        inputAction.Player.FireDirection.performed += ctx => lookDirection = ctx.ReadValue<Vector2>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        //Forward and back turn axis/input
-        this.Vertical = Input.GetAxis("Vertical");
-        //Left and right turn axis
-        this.Horizontal = Input.GetAxis("Horizontal");
-        //Up down facing axis
-        this.Vertical1 = Input.GetAxis("Vertical1");
-        //Strafing
-        this.Strafe = Input.GetAxis("Strafe");
+        //NEW INPUT SYSTEM
+        //Get the last used gamepad
+        var gamepad = Gamepad.current;
+        //Get controllers analog sticks, use if no InputActions in use
+        Vector2 lsMove = gamepad.leftStick.ReadValue();
+        Vector2 rsMove = gamepad.rightStick.ReadValue();
+        //New input system
+        float h = movementInput.x;
+        float v = movementInput.y;
 
-        if (Input.GetButton("Fire1"))
+        float look = lookDirection.x;
+
+        //OLD UNITY INPUT SYSTEM
+        ////Forward and back turn axis/input
+        //this.Vertical = Input.GetAxis("Vertical");
+        ////Left and right turn axis
+        //this.Horizontal = Input.GetAxis("Horizontal");
+        ////Up down facing axis
+        //this.Vertical1 = Input.GetAxis("Vertical1");
+        ////Strafing
+        //this.Strafe = Input.GetAxis("Strafe");
+
+        if (gamepad.rightTrigger.IsActuated(0.1f))
         {
             //Set the spawn position for the projectile
             if (!isSpawning)
@@ -62,13 +89,16 @@ public class PlayerControl : MonoBehaviour
         }
 
         //Forward movement
-        rb.AddForce(this.transform.forward * forwardForce * this.Vertical);
+        rb.AddForce(this.transform.forward * forwardForce * v);
 
         //Move player left and right
-        rb.AddForce(this.transform.right * forwardForce * this.Strafe);
+        rb.AddForce(this.transform.right * forwardForce * h);
 
-        //Rotate player
-        this.transform.Rotate(new Vector3(0, rotateSpeed * this.Horizontal * Time.deltaTime * 10));
+        //Rotate the player in direction the joystick is pointing.
+        TurnThePlayer();
+
+        //Rotate player clockwise and counter-clockwise
+        //this.transform.Rotate(new Vector3(0, rotateSpeed * look * Time.deltaTime * 10
 
         //Vector3 relativePos = new Vector3((transform.position.x + this.Horizontal), transform.position.y, transform.position.z + this.Vertical1) - transform.position;
         //Quaternion targetRotation = Quaternion.LookRotation(relativePos);
@@ -80,50 +110,27 @@ public class PlayerControl : MonoBehaviour
         //Vector3 lookVec = new Vector3(this.Horizontal, this.Vertical1, 4096);
         //if (lookVec.x != 0 && lookVec.y != 0)
         //    transform.rotation = Quaternion.LookRotation(lookVec, Vector3.back);
-
-        //Twist();
-
-        //if (gameObject.transform.rotation.eulerAngles.y > 90 && this.gameObject.transform.rotation.eulerAngles.y < 260)
-        //{
-        //  Move player left and right
-        //  rb.AddForce(this.transform.right * -forwardForce * this.Strafe);
-        //}
-        //  else
-        //{
-        //  Move player left and right
-        //  rb.AddForce(this.transform.right * forwardForce * this.Strafe);
-        //}
-
-        
-        //Debug.Log(this.gameObject.transform.rotation.eulerAngles.y);
-        //Debug.Log(lookVec);
-
     }
-   //void Twist()
-   // {
-   //     if (Horizontal == 0f && Vertical1 == 0f)
-   //     { // this statement allows it to recenter once the inputs are at zero 
-   //         Vector3 curRot = gameObject.transform.localEulerAngles; // the object you are rotating
-   //         Vector3 homeRot;
+    void TurnThePlayer()
+    {
+        Vector3 playerDirection = Vector3.right * lookDirection.x + Vector3.forward * lookDirection.y;
+        if (playerDirection.sqrMagnitude > 0.0f)
+        {
+            transform.rotation = Quaternion.LookRotation(playerDirection, Vector3.up);
+        }
+        //Vector2 input = lookDirection;
 
-   //         // this section determines the direction it returns home 
-   //         if (curRot.y > 180f)
-   //         {
-   //             Debug.Log(curRot.y);
-   //             homeRot = new Vector3(0f, 359.999f, 0f); //it doesnt return to perfect zero 
-   //         }
-   //         // otherwise it rotates wrong direction 
-   //         else
-   //         {                                                                      
-   //             homeRot = Vector3.zero;
-   //         }
-   //         gameObject.transform.localEulerAngles = Vector3.Slerp(curRot, homeRot, Time.deltaTime * 2);
-   //     }
-   //     else
-   //     {
-   //         gameObject.transform.localEulerAngles = new Vector3(0f, Mathf.Atan2(Horizontal, Vertical1) * 180 / Mathf.PI, 0f); // this does the actual rotaion according to inputs
-   //     }
-   // }
+        ////Convert input to a Vector3 where the Y axis will be used as the Z axis
+        //Vector3 lookPosition = new Vector3(input.x, 0, input.y);
+        //var lookRot = mainCamera.transform.TransformDirection(lookPosition);
+        //lookRot = Vector3.ProjectOnPlane(lookRot, Vector3.up);
+
+        //if (lookRot != Vector3.zero)
+        //{
+        //    Quaternion newRotation = Quaternion.LookRotation(lookRot);
+        //    rb.MoveRotation(newRotation);
+        //}
+    }
     void SpawnProjectile()
     {
         spawnPos = this.transform.position + this.transform.forward * spawnDistance;
@@ -148,5 +155,14 @@ public class PlayerControl : MonoBehaviour
             Destroy(other.gameObject);
             gameManager.playerHealth++;
         }
+    }
+    private void OnEnable()
+    {
+        inputAction.Enable();
+    }
+
+    private void OnDisable()
+    {
+        inputAction.Disable();
     }
 }

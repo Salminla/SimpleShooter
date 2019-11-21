@@ -23,7 +23,7 @@ public class EnemyControl : MonoBehaviour
     public float enemyHealth = 3;
 
     //Projectile stuff---------------
-    float spawnDistance = 3;
+    float spawnDistance = 4;
     Vector3 spawnPos;
     bool isSpawning;
     public float shootInterval = 2;
