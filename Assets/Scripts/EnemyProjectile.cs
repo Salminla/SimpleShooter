@@ -6,6 +6,8 @@ public class EnemyProjectile : MonoBehaviour
 {
     GameManager gameManager;
 
+    public GameObject impactPrefab;
+
     public float moveSpeed = 2;
     public float destroyTime = 3;
     // Start is called before the first frame update
@@ -33,10 +35,16 @@ public class EnemyProjectile : MonoBehaviour
         //If player is hit do this
         if (other.gameObject.CompareTag("Player"))
         {
+            Explode();
             gameManager.playerHealth--;
             Debug.Log("Player hit!");
             Destroy(gameObject);
         }
 
+    }
+    void Explode()
+    {
+        GameObject explosion = Instantiate(impactPrefab, transform.position, Quaternion.identity);
+        explosion.GetComponent<ParticleSystem>().Play();
     }
 }

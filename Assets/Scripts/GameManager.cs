@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviour
 {
     public GameObject player;
     Rigidbody playerRb;
+
+    public bool playerAlive = true;
 
     public float enemiesSpawned = 0;
     public float score = 0;
@@ -24,6 +27,9 @@ public class GameManager : MonoBehaviour
 
     public Image healthBar;
 
+    public GameObject endScreen;
+    public Button restart;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,7 +42,8 @@ public class GameManager : MonoBehaviour
 
         if (playerHealth < 1)
         {
-            //Debug.Log("Player ded");
+            playerAlive = false;
+            endScreen.SetActive(true);
         }
 
         //Pressing R resets the scene
@@ -46,7 +53,7 @@ public class GameManager : MonoBehaviour
         }
 
         UiPrint();
-        
+
         //Sets the scenes boundaries
         //Boundaries on the x-axis
         if (player.transform.position.x < -XLimit)
@@ -83,6 +90,28 @@ public class GameManager : MonoBehaviour
         if (playerHealth < 10)
         {
             playerHealth++;
+        }
+    }
+
+    public void ResetGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    //Detect if a click occurs
+    public void OnPointerClick(PointerEventData pointerEventData)
+    {
+        //Use this to tell when the user right-clicks on the Button
+        if (pointerEventData.button == PointerEventData.InputButton.Right)
+        {
+            //Output to console the clicked GameObject's name and the following message. You can replace this with your own actions for when clicking the GameObject.
+            Debug.Log(name + " Game Object Right Clicked!");
+        }
+
+        //Use this to tell when the user left-clicks on the Button
+        if (pointerEventData.button == PointerEventData.InputButton.Left)
+        {
+            Debug.Log(name + " Game Object Left Clicked!");
         }
     }
 }

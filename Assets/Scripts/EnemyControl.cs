@@ -13,6 +13,8 @@ public class EnemyControl : MonoBehaviour
     //Enemys projectile
     public GameObject projectile;
 
+    public GameObject destroyedPrefab;
+
     //Healthbar
     Canvas health;
     RectTransform rectTransform;
@@ -50,8 +52,12 @@ public class EnemyControl : MonoBehaviour
         //rectTransform.Rotate(new Vector3(1, 0, 0));
         rectTransform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
 
-        //Rotatate towards the set object
-        transform.LookAt(followedObject.transform);
+        if (gameManager.playerAlive)
+        {
+            //Rotate towards the set object
+            transform.LookAt(followedObject.transform);
+        }
+        
         //Add force to this objects RigidBody
         rb.AddForce(this.transform.forward * enemySpeed);
 
@@ -67,6 +73,7 @@ public class EnemyControl : MonoBehaviour
 
         if (enemyHealth < 1)
         {
+            Explode();
             gameManager.score+=2;
             Destroy(gameObject);
         }
@@ -79,5 +86,11 @@ public class EnemyControl : MonoBehaviour
         //Spawn the projectile
         Instantiate(projectile, spawnPos, this.transform.rotation);
         isSpawning = false;
+    }
+    void Explode()
+    {
+        GameObject explosion = Instantiate(destroyedPrefab, transform.position, Quaternion.identity);
+        explosion.GetComponent<ParticleSystem>().Play();
+        explosion.GetComponent<AudioSource>().Play();
     }
 }

@@ -30,6 +30,17 @@ public class PlayerControl : MonoBehaviour
     //Stores the players rotate speed in degrees 
     public float rotateSpeed = 5;
 
+    //Audio
+    public AudioClip shoot;
+    public AudioClip thruster;
+
+    //Paricle effects
+    public ParticleSystem thrustEffect;
+    public ParticleSystem shootEffect;
+    public GameObject destroyedPrefab;
+
+    private AudioSource myAudioSource;
+
     //Projectile stuff---------------
     float spawnDistance = 3;
     Vector3 spawnPos;
@@ -45,11 +56,18 @@ public class PlayerControl : MonoBehaviour
 
         rb = GetComponent<Rigidbody>();
 
+        myAudioSource = gameObject.GetComponent<AudioSource>();
+
+        thrustEffect = GameObject.FindGameObjectWithTag("Thrust").GetComponent<ParticleSystem>();
+        //shootEffect = GameObject.FindGameObjectWithTag("Shoot").GetComponent<ParticleSystem>();
+
         isSpawning = false;
 
         inputAction = new PlayerInputActions();
         inputAction.Player.Move.performed += ctx => movementInput = ctx.ReadValue<Vector2>();
         inputAction.Player.FireDirection.performed += ctx => lookDirection = ctx.ReadValue<Vector2>();
+
+        //thrustEffect.Play();
     }
 
     // Update is called once per frame
@@ -77,12 +95,13 @@ public class PlayerControl : MonoBehaviour
         ////Strafing
         //this.Strafe = Input.GetAxis("Strafe");
 
-        if (gamepad.rightTrigger.IsActuated(0.1f))
+        if (gamepad.rightTrigger.IsActuated(0.1f))//Keyboard.current.spaceKey.isPressed)
         {
             //Set the spawn position for the projectile
             if (!isSpawning)
             {
                 Invoke("SpawnProjectile", 0.1f);
+                myAudioSource.PlayOneShot(shoot);
                 isSpawning = true;
             }
            
@@ -96,6 +115,18 @@ public class PlayerControl : MonoBehaviour
 
         //Rotate the player in direction the joystick is pointing.
         TurnThePlayer();
+
+        if (v < 0.1f)
+            thrustEffect.Play();
+
+
+        Debug.Log(v);
+
+        if (gameManager.playerHealth < 1)
+        {
+            Explode();
+            gameObject.SetActive(false);
+        }
 
         //Rotate player clockwise and counter-clockwise
         //this.transform.Rotate(new Vector3(0, rotateSpeed * look * Time.deltaTime * 10
@@ -137,6 +168,12 @@ public class PlayerControl : MonoBehaviour
         //Spawn the projectile
         Instantiate(projectile, spawnPos, this.transform.rotation);
         isSpawning = false;
+    }
+    void Explode()
+    {
+        GameObject explosion = Instantiate(destroyedPrefab, transform.position, Quaternion.identity);
+        explosion.GetComponent<ParticleSystem>().Play();
+        explosion.GetComponent<AudioSource>().Play();
     }
 
     private void OnCollisionEnter(Collision other)

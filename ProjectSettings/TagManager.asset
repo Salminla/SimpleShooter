@@ -8,6 +8,9 @@ TagManager:
   - GameManager
   - Projectile
   - Health
+  - Explosion
+  - Trail
+  - Thrust
   layers:
   - Default
   - TransparentFX
