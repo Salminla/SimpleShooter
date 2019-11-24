@@ -40,6 +40,12 @@ public class EnemyProjectile : MonoBehaviour
             Debug.Log("Player hit!");
             Destroy(gameObject);
         }
+        if (other.gameObject.CompareTag("Asteroid"))
+        {
+            Explode();
+            other.gameObject.GetComponent<Asteroid>().currentHealth--;
+            Destroy(gameObject);
+        }
 
     }
     void Explode()

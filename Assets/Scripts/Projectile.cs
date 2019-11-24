@@ -15,7 +15,6 @@ public class Projectile : MonoBehaviour
     public ParticleSystem trailEffect;
     public GameObject impactPrefab;
 
-    AudioSource audioSource;
     public AudioClip impactSound;
     // Start is called before the first frame update
     void Start()
@@ -26,7 +25,6 @@ public class Projectile : MonoBehaviour
         ownCollider = gameObject.GetComponent<SphereCollider>();
         //Find the player objects collider
         playerCollider = GameObject.FindGameObjectWithTag("Player").GetComponent<BoxCollider>();
-        audioSource = gameObject.GetComponent<AudioSource>();
 
         //trailEffect = GameObject.FindGameObjectWithTag("Trail").GetComponent<ParticleSystem>();
 
@@ -48,15 +46,18 @@ public class Projectile : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Enemy"))
         {
-            //trailEffect.Stop();
-            //audioSource.PlayOneShot(impactSound);
             Explode();
             gameManager.score++;
             other.gameObject.GetComponent<EnemyControl>().enemyHealth--;
-            Debug.Log("Enemy hit!");
             Destroy(gameObject);
         }
-        
+        if (other.gameObject.CompareTag("Asteroid"))
+        {
+            Explode();
+            other.gameObject.GetComponent<Asteroid>().currentHealth--;
+            Destroy(gameObject);
+        }
+
     }
     void Explode()
     {

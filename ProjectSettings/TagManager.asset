@@ -11,6 +11,8 @@ TagManager:
   - Explosion
   - Trail
   - Thrust
+  - Muzzle
+  - Asteroid
   layers:
   - Default
   - TransparentFX

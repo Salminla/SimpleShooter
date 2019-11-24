@@ -77,8 +77,8 @@ public class PlayerControl : MonoBehaviour
         //Get the last used gamepad
         var gamepad = Gamepad.current;
         //Get controllers analog sticks, use if no InputActions in use
-        Vector2 lsMove = gamepad.leftStick.ReadValue();
-        Vector2 rsMove = gamepad.rightStick.ReadValue();
+        //Vector2 lsMove = gamepad.leftStick.ReadValue();
+        //Vector2 rsMove = gamepad.rightStick.ReadValue();
         //New input system
         float h = movementInput.x;
         float v = movementInput.y;
@@ -100,6 +100,7 @@ public class PlayerControl : MonoBehaviour
             //Set the spawn position for the projectile
             if (!isSpawning)
             {
+                shootEffect.Play();
                 Invoke("SpawnProjectile", 0.1f);
                 myAudioSource.PlayOneShot(shoot);
                 isSpawning = true;
@@ -118,9 +119,6 @@ public class PlayerControl : MonoBehaviour
 
         if (v < 0.1f)
             thrustEffect.Play();
-
-
-        Debug.Log(v);
 
         if (gameManager.playerHealth < 1)
         {

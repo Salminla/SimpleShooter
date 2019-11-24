@@ -28,7 +28,7 @@ public class @PlayerInputActions : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": ""FireDirection"",
-                    ""type"": ""Button"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""211b7bdb-9635-463d-9332-8e2ee5648c35"",
                     ""expectedControlType"": """",
                     ""processors"": """",
